@@ -1,0 +1,2 @@
+- 修复：WXML dataset 中布尔值以字符串形式传入，导致跨月日期点击判断失效。
+- 调整：pages/calendar/index.js 的 onDayTap 显式将 inMonth 转为布尔值。

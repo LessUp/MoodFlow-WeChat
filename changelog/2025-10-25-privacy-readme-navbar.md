@@ -1,0 +1,4 @@
+- 新增隐私与数据说明页面：pages/privacy/index（含暗色主题适配、导航栏颜色同步）
+- 设置页新增“隐私政策”入口
+- 所有页面根据主题同步导航栏颜色（calendar/settings/stats/privacy/detail）
+- 新增 README.md：项目使用、功能、数据结构、云同步配置、导入导出、提审要点

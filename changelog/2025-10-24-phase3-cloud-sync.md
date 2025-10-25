@@ -1,0 +1,8 @@
+- 阶段3：云同步
+  - 新增 utils/cloud.js：云初始化、Database 实例与 openid 获取
+  - 新增 utils/sync.js：本地与云端双向合并（以 ts 为准，last-write-wins），处理新增/更新/删除
+  - 新增云函数 cloudfunctions/login：返回 openid（含 package.json 依赖）
+  - 更新 app.js：启动时迁移本地 v2 并初始化云；若云可用则异步触发一次全量同步
+  - 更新 project.config.json：添加 cloudfunctionRoot = cloudfunctions/
+  - 设置页：新增云开关、环境 ID 保存、立即同步、同步状态提示
+  - 统计/设置/日历/详情页：与设置中的 emoji/颜色/周起始日保持一致

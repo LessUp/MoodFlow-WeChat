@@ -1,0 +1,73 @@
+<view class="container {{theme === 'dark' ? 'theme-dark' : 'theme-light'}}">
+  <view class="section">
+    <view class="label">周起始日</view>
+    <view class="row">
+      <button class="opt {{weekStart === 1 ? 'active' : ''}}" data-val="1" bindtap="onWeekTap">周一</button>
+      <button class="opt {{weekStart === 0 ? 'active' : ''}}" data-val="0" bindtap="onWeekTap">周日</button>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="label">主题</view>
+    <view class="row">
+      <button class="opt {{theme === 'light' ? 'active' : ''}}" data-val="light" bindtap="onThemeTap">浅色</button>
+      <button class="opt {{theme === 'dark' ? 'active' : ''}}" data-val="dark" bindtap="onThemeTap">深色</button>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="label">云同步</view>
+    <view class="row">
+      <switch checked="{{cloudEnabled}}" bindchange="onCloudSwitch" />
+      <input class="input" placeholder="云环境ID（如：xxx-yyy）" value="{{cloudEnvId}}" bindinput="onEnvIdInput" />
+    </view>
+    <view class="row">
+      <button class="primary" bindtap="onSaveCloud">保存云配置</button>
+      <button class="primary" bindtap="onSyncNow">立即同步</button>
+    </view>
+    <view class="status">{{syncStatus}}</view>
+  </view>
+
+  <view class="section">
+    <view class="label">表情集合</view>
+    <input class="input" placeholder="输入连续的表情字符" value="{{emojiText}}" bindinput="onEmojiInput" />
+    <view class="row">
+      <button class="primary" bindtap="onSaveEmoji">保存</button>
+      <button class="warn" bindtap="onReset">重置默认</button>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="label">颜色映射</view>
+    <view class="color-grid">
+      <block wx:for="{{colorItems}}" wx:key="em">
+        <view class="color-row">
+          <text class="emoji">{{item.em}}</text>
+          <input class="color-input" placeholder="#RRGGBB" value="{{item.color}}" data-idx="{{index}}" bindinput="onColorInput" />
+        </view>
+      </block>
+    </view>
+    <view class="row">
+      <button class="primary" bindtap="onSaveColors">保存颜色</button>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="label">数据</view>
+    <view class="row">
+      <button class="primary" bindtap="onExport">导出JSON</button>
+      <button class="warn" bindtap="onClearAll">清除全部</button>
+    </view>
+    <view class="row">
+      <button class="primary" bindtap="goPrivacy">隐私政策</button>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="label">导入JSON</view>
+    <textarea class="textarea" placeholder="贴入导出的 JSON 后点击导入" value="{{importText}}" bindinput="onImportInput"></textarea>
+    <view class="row">
+      <button class="primary" bindtap="onImportApply">导入</button>
+    </view>
+  </view>
+</view>

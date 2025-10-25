@@ -1,0 +1,5 @@
+- 初始化项目结构：app.json、app.js、app.wxss、project.config.json、sitemap.json
+- 新增 pages/calendar 日历页，支持月份切换、点击日期、今天快捷键
+- 新增 emoji 心情选择器与遮罩弹层
+- 新增本地存储 utils/storage.js，按日期键保存心情
+- 新增日期工具 utils/date.js，生成 6x7 月历数据

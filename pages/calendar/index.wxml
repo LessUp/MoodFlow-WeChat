@@ -1,0 +1,41 @@
+<view class="container {{theme === 'dark' ? 'theme-dark' : 'theme-light'}}" bindtouchstart="onTouchStart" bindtouchend="onTouchEnd">
+  <view class="header">
+    <view class="nav" bindtap="onPrevMonth">&lt;</view>
+    <picker mode="date" fields="month" value="{{ymValue}}" bindchange="onMonthPicked">
+      <view class="title">{{monthLabel}}</view>
+    </picker>
+    <view class="nav" bindtap="onNextMonth">&gt;</view>
+  </view>
+  <view class="week">
+    <block wx:for="{{weekHeaders}}" wx:key="*this">
+      <text class="w {{(item === '六' || item === '日') ? 'weekend' : ''}}">{{item}}</text>
+    </block>
+  </view>
+  <view class="days">
+    <block wx:for="{{days}}" wx:key="dateKey">
+      <view class="day {{item.inMonth ? '' : 'out'}} {{item.isToday ? 'today' : ''}}" style="background-color: {{item.bg}};" data-datekey="{{item.dateKey}}" data-inmonth="{{item.inMonth}}" bindtap="onDayTap" bindlongpress="onDayLongPress">
+        <text class="d">{{item.day}}</text>
+        <view wx:if="{{item.note}}" class="note-dot"></view>
+        <text wx:if="{{item.mood}}" class="mood">{{item.mood}}</text>
+      </view>
+    </block>
+  </view>
+  <button class="today-btn" type="default" bindtap="onTodayTap">今天</button>
+</view>
+
+<view wx:if="{{pickerVisible}}" class="mask" bindtap="onMaskTap"></view>
+<view wx:if="{{pickerVisible}}" class="picker">
+  <view class="picker-title">选择心情</view>
+  <view class="emoji-grid">
+    <block wx:for="{{emojiOptions}}" wx:key="*this">
+      <view class="emoji-item" data-mood="{{item}}" bindtap="onChooseEmoji">{{item}}</view>
+    </block>
+  </view>
+  <button class="note-btn" type="default" bindtap="onGoDetailFromPicker">添加备注</button>
+  <button class="clear-btn" type="warn" bindtap="onClearMood">清除</button>
+</view>
+
+<view class="tools">
+  <button size="mini" bindtap="goStats">统计</button>
+  <button size="mini" bindtap="goSettings">设置</button>
+</view>

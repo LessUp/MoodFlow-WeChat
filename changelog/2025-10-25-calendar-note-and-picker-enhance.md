@@ -1,0 +1,7 @@
+- 日历页增强：
+  - 渲染基于 v2 entries（可读取 mood 与 note），仅当月着色
+  - 为有备注的日期显示小圆点标记（note-dot）
+- 选择器增强：
+  - 新增“添加备注”按钮，直接跳转详情页
+- 涉及文件：
+  - pages/calendar/index.js / index.wxml / index.wxss

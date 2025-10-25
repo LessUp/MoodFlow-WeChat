@@ -1,0 +1,34 @@
+.container { padding: 24rpx; }
+.header { display: flex; justify-content: space-between; align-items: center; padding: 12rpx 0; }
+.nav { width: 80rpx; text-align: center; font-size: 36rpx; color: #333; }
+.title { font-size: 32rpx; font-weight: 600; color: #111; }
+.week { display: flex; margin-top: 12rpx; color: #666; }
+.week .w { width: 14.2857%; text-align: center; font-size: 24rpx; padding: 8rpx 0; }
+.week .weekend { color: #999; }
+.days { display: flex; flex-wrap: wrap; background: #fff; border-radius: 16rpx; overflow: hidden; margin-top: 8rpx; }
+.day { width: 14.2857%; height: 112rpx; box-sizing: border-box; padding: 8rpx; position: relative; display: flex; align-items: flex-start; justify-content: center; }
+.day.out { color: #bbb; background: #fafafa; }
+.day.today { border: 2rpx solid #07c160; }
+.day .d { font-size: 26rpx; }
+.day .mood { position: absolute; bottom: 12rpx; font-size: 40rpx; }
+.day .note-dot { position: absolute; right: 10rpx; top: 10rpx; width: 12rpx; height: 12rpx; background: #07c160; border-radius: 50%; }
+.today-btn { position: fixed; right: 24rpx; bottom: 24rpx; z-index: 10; background: #07c160; color: #fff; border-radius: 999rpx; padding: 16rpx 24rpx; font-size: 28rpx; }
+.mask { position: fixed; left: 0; right: 0; top: 0; bottom: 0; background: rgba(0,0,0,0.4); z-index: 98; }
+.picker { position: fixed; left: 0; right: 0; bottom: 0; background: #fff; border-top-left-radius: 24rpx; border-top-right-radius: 24rpx; padding: 24rpx; z-index: 99; }
+.picker-title { text-align: center; font-size: 28rpx; margin-bottom: 16rpx; }
+.emoji-grid { display: flex; flex-wrap: wrap; }
+.emoji-item { width: 14.2857%; height: 96rpx; display: flex; align-items: center; justify-content: center; font-size: 44rpx; }
+.note-btn { margin-top: 12rpx; }
+.clear-btn { margin-top: 12rpx; }
+.tools { position: fixed; left: 24rpx; bottom: 24rpx; display: flex; gap: 12rpx; z-index: 10; }
+
+.theme-dark { background-color: #0f0f0f; color: #eee; }
+.theme-dark .title { color: #eee; }
+.theme-dark .week { color: #aaa; }
+.theme-dark .week .weekend { color: #888; }
+.theme-dark .days { background: #161616; }
+.theme-dark .day { color: #e6e6e6; }
+.theme-dark .day.out { color: #7a7a7a; background: #101010; }
+.theme-dark .picker { background: #1c1c1c; }
+.theme-dark .picker-title { color: #ddd; }
+.theme-dark .emoji-item { color: #eee; }

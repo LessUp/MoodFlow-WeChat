@@ -1,0 +1,13 @@
+- 体验完善：
+  - 日历：新增左右滑动切换月份；标题支持月份选择器（picker: month）
+  - 日历：备注可视化（note-dot 标记）与“添加备注”快捷按钮
+  - 主题：设置页支持浅色/深色切换；日历/设置/统计页适配暗色样式
+  - 统计：无数据空状态提示与样式
+  - 数据：设置页支持导入 JSON 并按 ts 合并（storage.mergeEntries）
+  - 同步：本地数据变化自动触发云同步（App.onLocalDataChange）
+- 涉及文件：
+  - pages/calendar/index.(js|wxml|wxss)
+  - pages/settings/index.(js|wxml|wxss)
+  - pages/stats/index.(js|wxml|wxss)
+  - utils/storage.js、utils/settings.js
+  - app.js

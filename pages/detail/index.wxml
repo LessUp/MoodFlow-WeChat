@@ -1,0 +1,25 @@
+<view class="container {{theme === 'dark' ? 'theme-dark' : 'theme-light'}}">
+  <view class="section">
+    <view class="label">日期</view>
+    <view class="value date">{{dateKey}}</view>
+  </view>
+
+  <view class="section">
+    <view class="label">选择心情</view>
+    <view class="emoji-grid">
+      <block wx:for="{{emojiOptions}}" wx:key="*this">
+        <view class="emoji-item {{item === mood ? 'selected' : ''}}" data-mood="{{item}}" bindtap="onChooseEmoji">{{item}}</view>
+      </block>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="label">备注</view>
+    <textarea class="note" placeholder="写点备注..." value="{{note}}" bindinput="onNoteInput" maxlength="200"></textarea>
+  </view>
+
+  <view class="actions">
+    <button class="btn primary" bindtap="onSave">保存</button>
+    <button class="btn warn" bindtap="onClear">清除</button>
+  </view>
+</view>

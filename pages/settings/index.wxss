@@ -1,0 +1,20 @@
+.container { padding: 24rpx; }
+.section { background: #fff; border-radius: 16rpx; padding: 20rpx; margin-bottom: 20rpx; }
+.label { font-size: 28rpx; color: #555; margin-bottom: 12rpx; }
+.row { display: flex; gap: 12rpx; }
+.opt { flex: 1; }
+.opt.active { background: #07c160; color: #fff; }
+.input { width: 100%; background: #f7f7f7; border-radius: 12rpx; padding: 16rpx; box-sizing: border-box; margin-bottom: 12rpx; }
+.primary { background: #07c160; color: #fff; }
+.warn { background: #fa5151; color: #fff; }
+.color-grid { display: flex; flex-direction: column; gap: 12rpx; }
+.color-row { display: flex; align-items: center; gap: 12rpx; }
+.emoji { font-size: 44rpx; width: 64rpx; text-align: center; }
+.color-input { flex: 1; background: #f7f7f7; border-radius: 12rpx; padding: 16rpx; box-sizing: border-box; }
+.textarea { width: 100%; min-height: 200rpx; background: #f7f7f7; border-radius: 12rpx; padding: 16rpx; box-sizing: border-box; }
+
+.theme-dark { background-color: #0f0f0f; color: #eee; }
+.theme-dark .section { background: #161616; }
+.theme-dark .label { color: #bbb; }
+.theme-dark .opt.active { background: #3ea76a; color: #fff; }
+.theme-dark .input, .theme-dark .color-input, .theme-dark .textarea { background: #1c1c1c; color: #eee; }

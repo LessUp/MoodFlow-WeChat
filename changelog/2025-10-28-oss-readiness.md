@@ -1,0 +1,6 @@
+- 开源准备：
+  - 新增 .gitignore（Node/小程序/日志/IDE/构建产物/环境文件）
+  - 升级 README 为开源版（项目更名为“MoodFlow · 心情日历”，特性/安装/云同步/ECharts/隐私/贡献/许可证/路线/变更）
+  - 新增 LICENSE（MIT）
+  - 新增 ROADMAP.md（近期/中期规划、工程质量、社区治理与里程碑）
+- 注意：若需启用 ECharts，请将 `echarts.min.js` 复制为 `/ec-canvas/echarts.js`。

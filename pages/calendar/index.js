@@ -8,10 +8,10 @@ Page({
   data: {
     year: 0,
     month: 0,
-    monthLabel: '',
     days: [],
     pickerVisible: false,
     selectedDateKey: '',
+    selectedDayHasMood: false,
     emojiOptions: ['😀','🙂','😐','🙁','😭','😡','🤩','😴','🧘','🤒','🤗','🤯','🤤'],
     weekHeaders: [],
     weekStart: 1,
@@ -30,7 +30,6 @@ Page({
     const s = settings.getSettings()
     const weekStart = s.weekStart
     const language = s.language || 'zh'
-    const monthLabel = dateUtil.monthLabel(year, month, language)
     const entries = storage.getAllEntries()
     const locked = storage.isLocked()
     const days = locked ? this.buildDays(year, month, {}, weekStart) : this.buildDays(year, month, entries, weekStart)
@@ -39,7 +38,7 @@ Page({
     const theme = s.theme || 'light'
     const ymValue = year + '-' + dateUtil.pad(month)
     const accentColor = s.accentColor || '#07c160'
-    this.setData({ year, month, monthLabel, days, weekHeaders, weekStart, emojiOptions, theme, ymValue, accentColor, language, dataLocked: locked })
+    this.setData({ year, month, days, weekHeaders, weekStart, emojiOptions, theme, ymValue, accentColor, language, dataLocked: locked })
   },
   onShow() {
     this.refreshTexts()
@@ -53,7 +52,7 @@ Page({
     const locked = storage.isLocked()
     this.setData({ weekStart, weekHeaders, emojiOptions, theme, accentColor, language, dataLocked: locked })
     try {
-      wx.setNavigationBarColor({ frontColor: theme === 'dark' ? '#ffffff' : '#000000', backgroundColor: theme === 'dark' ? '#0f0f0f' : '#ffffff' })
+      wx.setNavigationBarColor({ frontColor: theme === 'dark' ? '#ffffff' : '#000000', backgroundColor: theme === 'dark' ? '#1e1e1e' : '#ffffff' })
     } catch(e) {}
     if (this.data.year && this.data.month) this.refresh()
   },
@@ -65,11 +64,7 @@ Page({
       try { weekStart = settings.getSettings().weekStart || 1 } catch (e) { weekStart = 1 }
     }
     const weekHeaders = dateUtil.weekHeaders(weekStart, lang)
-    let monthLabel = this.data.monthLabel
-    if (this.data.year && this.data.month) {
-      monthLabel = dateUtil.monthLabel(this.data.year, this.data.month, lang)
-    }
-    this.setData({ i18n: dict, language: lang, weekHeaders, monthLabel })
+    this.setData({ i18n: dict, language: lang, weekHeaders })
   },
   applyMonthChange(year, month, extra = {}) {
     if (!year || !month) return
@@ -79,12 +74,13 @@ Page({
     const update = Object.assign({
       year,
       month,
-      monthLabel: dateUtil.monthLabel(year, month, this.data.language || 'zh'),
       ymValue: year + '-' + dateUtil.pad(month),
       days,
       dataLocked: locked
     }, extra)
-    this.setData(update)
+    this.setData(update, () => {
+      this.checkSelectedMood()
+    })
   },
   buildDays(year, month, entries, weekStart) {
     const base = dateUtil.buildMonthGrid(year, month, weekStart)
@@ -101,7 +97,22 @@ Page({
     const locked = storage.isLocked()
     const entries = locked ? {} : storage.getAllEntries()
     const days = this.buildDays(this.data.year, this.data.month, entries, this.data.weekStart)
-    this.setData({ days, dataLocked: locked })
+    this.setData({ days, dataLocked: locked }, () => {
+      this.checkSelectedMood()
+    })
+  },
+  checkSelectedMood() {
+    const key = this.data.selectedDateKey
+    if (!key) {
+      this.setData({ selectedDayHasMood: false })
+      return
+    }
+    const found = this.data.days.find(d => d.dateKey === key)
+    if (found && found.mood) {
+      this.setData({ selectedDayHasMood: true })
+    } else {
+      this.setData({ selectedDayHasMood: false })
+    }
   },
   onPrevMonth() {
     const p = dateUtil.prevMonth(this.data.year, this.data.month)
@@ -130,22 +141,37 @@ Page({
     const month = now.getMonth() + 1
     const day = now.getDate()
     const key = dateUtil.formatDateKey(year, month, day)
-    this.applyMonthChange(year, month, {
-      pickerVisible: true,
-      selectedDateKey: key
-    })
+    
+    // If current view is not this month, switch
+    if (this.data.year !== year || this.data.month !== month) {
+      this.applyMonthChange(year, month, {
+        pickerVisible: true,
+        selectedDateKey: key
+      })
+    } else {
+      this.setData({ pickerVisible: true, selectedDateKey: key }, () => {
+        this.checkSelectedMood()
+      })
+    }
   },
   onDayTap(e) {
     const key = e.currentTarget.dataset.datekey
     const inMonthRaw = e.currentTarget.dataset.inmonth
     const inMonth = inMonthRaw === true || inMonthRaw === 'true'
+    
     if (!inMonth) {
       const d = new Date(key.replace(/-/g, '/'))
       const year = d.getFullYear()
       const month = d.getMonth() + 1
-      this.applyMonthChange(year, month)
+      this.applyMonthChange(year, month, {
+        pickerVisible: true,
+        selectedDateKey: key
+      })
+    } else {
+      this.setData({ pickerVisible: true, selectedDateKey: key }, () => {
+        this.checkSelectedMood()
+      })
     }
-    this.setData({ pickerVisible: true, selectedDateKey: key })
   },
   onDayLongPress(e) {
     const key = e.currentTarget.dataset.datekey
@@ -185,6 +211,10 @@ Page({
     const key = this.data.selectedDateKey
     try {
       storage.setMood(key, mood)
+      // Close picker after selection for smoother UX? 
+      // Or keep it open? "Beautification" implies smoother UX. 
+      // Let's close it after a short delay to show feedback or just close it.
+      // Original code closed it immediately.
       this.setData({ pickerVisible: false })
       this.refresh()
     } catch (err) {

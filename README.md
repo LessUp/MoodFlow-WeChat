@@ -36,12 +36,14 @@ MoodFlow/
 ### 环境要求
 
 - Node.js >= 18
-- pnpm >= 8
+- npm >= 9 或 pnpm >= 8
 - MongoDB (API 服务需要)
 
 ### 安装依赖
 
 ```bash
+npm install
+# 或
 pnpm install
 ```
 
@@ -49,10 +51,10 @@ pnpm install
 
 ```bash
 # 启动网页版
-pnpm dev:web
+npm run dev:web
 
 # 启动 API 服务
-pnpm dev:api
+npm run dev:api
 
 # 微信小程序
 # 使用微信开发者工具打开 apps/miniprogram
@@ -61,7 +63,7 @@ pnpm dev:api
 ### 构建
 
 ```bash
-pnpm build
+npm run build
 ```
 
 ## 📱 微信小程序

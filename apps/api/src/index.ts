@@ -2,10 +2,10 @@
  * MoodFlow API 服务入口
  */
 
+import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
-import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 
 import { authRouter } from './routes/auth';
@@ -13,8 +13,6 @@ import { syncRouter } from './routes/sync';
 import { backupRouter } from './routes/backup';
 import { userRouter } from './routes/user';
 import { errorHandler } from './middleware/error';
-
-dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;

@@ -5,6 +5,7 @@
 import { Router, Response } from 'express';
 import { z } from 'zod';
 import { authenticate, AuthRequest } from '../middleware/auth';
+import { asyncHandler } from '../middleware/asyncHandler';
 import { MoodRecord } from '../models/MoodRecord';
 import type { MoodRecordMap } from '@moodflow/types';
 
@@ -16,17 +17,25 @@ syncRouter.use(authenticate);
 // 请求验证 schema
 const syncRecordsSchema = z.object({
   records: z.record(z.object({
-    mood: z.string(),
+    mood: z.string().optional(),
     note: z.string().optional(),
     ts: z.number(),
     tags: z.array(z.string()).optional()
   }))
 });
 
+const dateKeySchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
+
+const upsertRecordSchema = z.object({
+  mood: z.string().optional(),
+  note: z.string().optional(),
+  tags: z.array(z.string()).optional()
+});
+
 /**
  * GET /api/sync/records - 获取所有记录
  */
-syncRouter.get('/records', async (req: AuthRequest, res: Response) => {
+syncRouter.get('/records', asyncHandler(async (req: AuthRequest, res: Response) => {
   const userId = req.userId!;
   
   const records = await MoodRecord.find({ userId });
@@ -45,56 +54,68 @@ syncRouter.get('/records', async (req: AuthRequest, res: Response) => {
     success: true,
     data
   });
-});
+}));
 
 /**
  * POST /api/sync/records - 上传/合并记录
  */
-syncRouter.post('/records', async (req: AuthRequest, res: Response) => {
+syncRouter.post('/records', asyncHandler(async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.userId!;
     const { records } = syncRecordsSchema.parse(req.body);
-    
+
+    const entries = Object.entries(records);
+    const dateKeys = entries.map(([dateKey]) => dateKey);
+
+    const existingDocs = await MoodRecord.find(
+      { userId, dateKey: { $in: dateKeys } },
+      { dateKey: 1, ts: 1 }
+    );
+    const existingTsByKey = new Map<string, number>();
+    for (const doc of existingDocs) {
+      existingTsByKey.set(doc.dateKey, doc.ts);
+    }
+
+    const ops: any[] = [];
     let updated = 0;
     let created = 0;
-    
-    for (const [dateKey, entry] of Object.entries(records)) {
-      if (!entry.mood && !entry.note) {
-        // 空记录，删除
-        await MoodRecord.deleteOne({ userId, dateKey });
+
+    for (const [dateKey, entry] of entries) {
+      const mood = entry.mood || '';
+      const note = entry.note || '';
+      const tags = entry.tags || [];
+
+      if (!mood && !note) {
+        ops.push({ deleteOne: { filter: { userId, dateKey } } });
         continue;
       }
-      
-      const existing = await MoodRecord.findOne({ userId, dateKey });
-      
-      if (existing) {
-        // 后写优先合并
-        if (entry.ts > existing.ts) {
-          await MoodRecord.updateOne(
-            { userId, dateKey },
-            { 
-              mood: entry.mood,
-              note: entry.note || '',
-              tags: entry.tags || [],
-              ts: entry.ts
+
+      const existingTs = existingTsByKey.get(dateKey);
+
+      if (existingTs !== undefined) {
+        if (entry.ts > existingTs) {
+          ops.push({
+            updateOne: {
+              filter: { userId, dateKey },
+              update: { $set: { mood, note, tags, ts: entry.ts } }
             }
-          );
+          });
           updated++;
         }
       } else {
-        // 创建新记录
-        await MoodRecord.create({
-          userId,
-          dateKey,
-          mood: entry.mood,
-          note: entry.note || '',
-          tags: entry.tags || [],
-          ts: entry.ts
+        ops.push({
+          insertOne: {
+            document: { userId, dateKey, mood, note, tags, ts: entry.ts }
+          }
         });
         created++;
       }
     }
-    
+
+    if (ops.length > 0) {
+      await MoodRecord.bulkWrite(ops, { ordered: false });
+    }
+
     res.json({
       success: true,
       data: { updated, created }
@@ -108,15 +129,15 @@ syncRouter.post('/records', async (req: AuthRequest, res: Response) => {
     }
     throw error;
   }
-});
+}));
 
 /**
  * PUT /api/sync/records/:dateKey - 更新单条记录
  */
-syncRouter.put('/records/:dateKey', async (req: AuthRequest, res: Response) => {
+syncRouter.put('/records/:dateKey', asyncHandler(async (req: AuthRequest, res: Response) => {
   const userId = req.userId!;
-  const { dateKey } = req.params;
-  const { mood, note, tags } = req.body;
+  const dateKey = dateKeySchema.parse(req.params.dateKey);
+  const { mood, note, tags } = upsertRecordSchema.parse(req.body);
   
   const ts = Date.now();
   
@@ -139,14 +160,14 @@ syncRouter.put('/records/:dateKey', async (req: AuthRequest, res: Response) => {
     success: true,
     data: { dateKey, mood, note, tags, ts }
   });
-});
+}));
 
 /**
  * DELETE /api/sync/records/:dateKey - 删除单条记录
  */
-syncRouter.delete('/records/:dateKey', async (req: AuthRequest, res: Response) => {
+syncRouter.delete('/records/:dateKey', asyncHandler(async (req: AuthRequest, res: Response) => {
   const userId = req.userId!;
-  const { dateKey } = req.params;
+  const dateKey = dateKeySchema.parse(req.params.dateKey);
   
   await MoodRecord.deleteOne({ userId, dateKey });
   
@@ -154,12 +175,12 @@ syncRouter.delete('/records/:dateKey', async (req: AuthRequest, res: Response) =
     success: true,
     data: { deleted: true }
   });
-});
+}));
 
 /**
  * DELETE /api/sync/records - 清空所有记录
  */
-syncRouter.delete('/records', async (req: AuthRequest, res: Response) => {
+syncRouter.delete('/records', asyncHandler(async (req: AuthRequest, res: Response) => {
   const userId = req.userId!;
   
   const result = await MoodRecord.deleteMany({ userId });
@@ -168,12 +189,12 @@ syncRouter.delete('/records', async (req: AuthRequest, res: Response) => {
     success: true,
     data: { deleted: result.deletedCount }
   });
-});
+}));
 
 /**
  * GET /api/sync/status - 获取同步状态
  */
-syncRouter.get('/status', async (req: AuthRequest, res: Response) => {
+syncRouter.get('/status', asyncHandler(async (req: AuthRequest, res: Response) => {
   const userId = req.userId!;
   
   const count = await MoodRecord.countDocuments({ userId });
@@ -186,4 +207,4 @@ syncRouter.get('/status', async (req: AuthRequest, res: Response) => {
       lastSyncTs: latest?.ts || 0
     }
   });
-});
+}));

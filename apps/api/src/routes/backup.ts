@@ -5,9 +5,10 @@
 import { Router, Response } from 'express';
 import { z } from 'zod';
 import { authenticate, AuthRequest } from '../middleware/auth';
+import { asyncHandler } from '../middleware/asyncHandler';
 import { Backup } from '../models/Backup';
 import { MoodRecord } from '../models/MoodRecord';
-import type { MoodRecordMap, BackupRecord } from '@moodflow/types';
+import type { MoodRecordMap, BackupRecord, MoodEntry } from '@moodflow/types';
 
 export const backupRouter = Router();
 
@@ -22,7 +23,7 @@ const createBackupSchema = z.object({
 /**
  * GET /api/backup/list - 获取备份列表
  */
-backupRouter.get('/list', async (req: AuthRequest, res: Response) => {
+backupRouter.get('/list', asyncHandler(async (req: AuthRequest, res: Response) => {
   const userId = req.userId!;
   const limit = parseInt(req.query.limit as string) || 10;
   
@@ -43,12 +44,12 @@ backupRouter.get('/list', async (req: AuthRequest, res: Response) => {
     success: true,
     data: list
   });
-});
+}));
 
 /**
  * POST /api/backup/create - 创建备份
  */
-backupRouter.post('/create', async (req: AuthRequest, res: Response) => {
+backupRouter.post('/create', asyncHandler(async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.userId!;
     const { note } = createBackupSchema.parse(req.body);
@@ -104,12 +105,12 @@ backupRouter.post('/create', async (req: AuthRequest, res: Response) => {
     }
     throw error;
   }
-});
+}));
 
 /**
  * GET /api/backup/:id - 获取备份详情
  */
-backupRouter.get('/:id', async (req: AuthRequest, res: Response) => {
+backupRouter.get('/:id', asyncHandler(async (req: AuthRequest, res: Response) => {
   const userId = req.userId!;
   const { id } = req.params;
   
@@ -133,12 +134,12 @@ backupRouter.get('/:id', async (req: AuthRequest, res: Response) => {
       payload: JSON.parse(backup.payload)
     }
   });
-});
+}));
 
 /**
  * POST /api/backup/:id/restore - 恢复备份
  */
-backupRouter.post('/:id/restore', async (req: AuthRequest, res: Response) => {
+backupRouter.post('/:id/restore', asyncHandler(async (req: AuthRequest, res: Response) => {
   const userId = req.userId!;
   const { id } = req.params;
   const { overwrite } = req.body;
@@ -153,6 +154,7 @@ backupRouter.post('/:id/restore', async (req: AuthRequest, res: Response) => {
   }
   
   const backupData: MoodRecordMap = JSON.parse(backup.payload);
+  const backupEntries = Object.entries(backupData) as Array<[string, MoodEntry]>;
   
   let restored = 0;
   let skipped = 0;
@@ -161,7 +163,7 @@ backupRouter.post('/:id/restore', async (req: AuthRequest, res: Response) => {
     // 覆盖模式：清空后导入
     await MoodRecord.deleteMany({ userId });
     
-    for (const [dateKey, entry] of Object.entries(backupData)) {
+    for (const [dateKey, entry] of backupEntries) {
       await MoodRecord.create({
         userId,
         dateKey,
@@ -174,7 +176,7 @@ backupRouter.post('/:id/restore', async (req: AuthRequest, res: Response) => {
     }
   } else {
     // 合并模式：后写优先
-    for (const [dateKey, entry] of Object.entries(backupData)) {
+    for (const [dateKey, entry] of backupEntries) {
       const existing = await MoodRecord.findOne({ userId, dateKey });
       
       if (existing && existing.ts >= entry.ts) {
@@ -200,12 +202,12 @@ backupRouter.post('/:id/restore', async (req: AuthRequest, res: Response) => {
     success: true,
     data: { restored, skipped }
   });
-});
+}));
 
 /**
  * DELETE /api/backup/:id - 删除备份
  */
-backupRouter.delete('/:id', async (req: AuthRequest, res: Response) => {
+backupRouter.delete('/:id', asyncHandler(async (req: AuthRequest, res: Response) => {
   const userId = req.userId!;
   const { id } = req.params;
   
@@ -222,12 +224,12 @@ backupRouter.delete('/:id', async (req: AuthRequest, res: Response) => {
     success: true,
     data: { deleted: true }
   });
-});
+}));
 
 /**
  * GET /api/backup/:id/download - 下载备份
  */
-backupRouter.get('/:id/download', async (req: AuthRequest, res: Response) => {
+backupRouter.get('/:id/download', asyncHandler(async (req: AuthRequest, res: Response) => {
   const userId = req.userId!;
   const { id } = req.params;
   
@@ -245,4 +247,4 @@ backupRouter.get('/:id/download', async (req: AuthRequest, res: Response) => {
   res.setHeader('Content-Type', 'application/json');
   res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
   res.send(backup.payload);
-});
+}));

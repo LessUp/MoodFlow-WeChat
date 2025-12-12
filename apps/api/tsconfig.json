@@ -7,10 +7,21 @@
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@moodflow/types": ["../../packages/types/src"],
+      "@moodflow/types/*": ["../../packages/types/src/*"],
+      "@moodflow/core": ["../../packages/core/src"],
+      "@moodflow/core/*": ["../../packages/core/src/*"]
+    },
     "outDir": "./dist",
-    "rootDir": "./src",
+    "rootDir": "../..",
     "resolveJsonModule": true
   },
-  "include": ["src/**/*"],
+  "include": [
+    "src/**/*",
+    "../../packages/types/src/**/*",
+    "../../packages/core/src/**/*"
+  ],
   "exclude": ["node_modules", "dist"]
 }

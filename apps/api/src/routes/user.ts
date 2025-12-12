@@ -5,6 +5,7 @@
 import { Router, Response } from 'express';
 import { z } from 'zod';
 import { authenticate, AuthRequest } from '../middleware/auth';
+import { asyncHandler } from '../middleware/asyncHandler';
 import { User } from '../models/User';
 import { hashPassword, verifyPassword } from '../services/auth';
 
@@ -37,7 +38,7 @@ const changePasswordSchema = z.object({
 /**
  * PUT /api/user/profile - 更新用户资料
  */
-userRouter.put('/profile', async (req: AuthRequest, res: Response) => {
+userRouter.put('/profile', asyncHandler(async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.userId!;
     const data = updateProfileSchema.parse(req.body);
@@ -72,12 +73,12 @@ userRouter.put('/profile', async (req: AuthRequest, res: Response) => {
     }
     throw error;
   }
-});
+}));
 
 /**
  * PUT /api/user/settings - 更新用户设置
  */
-userRouter.put('/settings', async (req: AuthRequest, res: Response) => {
+userRouter.put('/settings', asyncHandler(async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.userId!;
     const data = updateSettingsSchema.parse(req.body);
@@ -116,24 +117,24 @@ userRouter.put('/settings', async (req: AuthRequest, res: Response) => {
     }
     throw error;
   }
-});
+}));
 
 /**
  * GET /api/user/settings - 获取用户设置
  */
-userRouter.get('/settings', async (req: AuthRequest, res: Response) => {
+userRouter.get('/settings', asyncHandler(async (req: AuthRequest, res: Response) => {
   const user = req.user!;
   
   res.json({
     success: true,
     data: user.settings
   });
-});
+}));
 
 /**
  * PUT /api/user/password - 修改密码
  */
-userRouter.put('/password', async (req: AuthRequest, res: Response) => {
+userRouter.put('/password', asyncHandler(async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.userId!;
     const { oldPassword, newPassword } = changePasswordSchema.parse(req.body);
@@ -177,12 +178,12 @@ userRouter.put('/password', async (req: AuthRequest, res: Response) => {
     }
     throw error;
   }
-});
+}));
 
 /**
  * DELETE /api/user/account - 删除账号
  */
-userRouter.delete('/account', async (req: AuthRequest, res: Response) => {
+userRouter.delete('/account', asyncHandler(async (req: AuthRequest, res: Response) => {
   const userId = req.userId!;
   
   // 删除用户所有数据
@@ -197,12 +198,12 @@ userRouter.delete('/account', async (req: AuthRequest, res: Response) => {
     success: true,
     data: { message: '账号已删除' }
   });
-});
+}));
 
 /**
  * POST /api/user/export - 导出所有用户数据
  */
-userRouter.post('/export', async (req: AuthRequest, res: Response) => {
+userRouter.post('/export', asyncHandler(async (req: AuthRequest, res: Response) => {
   const userId = req.userId!;
   const user = req.user!;
   
@@ -234,4 +235,4 @@ userRouter.post('/export', async (req: AuthRequest, res: Response) => {
     success: true,
     data: exportData
   });
-});
+}));

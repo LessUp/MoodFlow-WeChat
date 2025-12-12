@@ -11,6 +11,7 @@ import {
   refreshTokens 
 } from '../services/auth';
 import { authenticate, AuthRequest } from '../middleware/auth';
+import { asyncHandler } from '../middleware/asyncHandler';
 
 export const authRouter = Router();
 
@@ -37,7 +38,7 @@ const refreshSchema = z.object({
 /**
  * POST /api/auth/register - 邮箱注册
  */
-authRouter.post('/register', async (req, res: Response) => {
+authRouter.post('/register', asyncHandler(async (req, res: Response) => {
   try {
     const data = registerSchema.parse(req.body);
     const { user, tokens } = await registerByEmail(data.email, data.password, data.username);
@@ -71,12 +72,12 @@ authRouter.post('/register', async (req, res: Response) => {
     
     throw error;
   }
-});
+}));
 
 /**
  * POST /api/auth/login - 邮箱登录
  */
-authRouter.post('/login', async (req, res: Response) => {
+authRouter.post('/login', asyncHandler(async (req, res: Response) => {
   try {
     const data = loginSchema.parse(req.body);
     const { user, tokens } = await loginByEmail(data.email, data.password);
@@ -110,12 +111,12 @@ authRouter.post('/login', async (req, res: Response) => {
     
     throw error;
   }
-});
+}));
 
 /**
  * POST /api/auth/wechat - 微信登录
  */
-authRouter.post('/wechat', async (req, res: Response) => {
+authRouter.post('/wechat', asyncHandler(async (req, res: Response) => {
   try {
     const data = wxLoginSchema.parse(req.body);
     const { user, tokens, isNew } = await loginByWechat(data.code);
@@ -156,12 +157,12 @@ authRouter.post('/wechat', async (req, res: Response) => {
     
     throw error;
   }
-});
+}));
 
 /**
  * POST /api/auth/refresh - 刷新令牌
  */
-authRouter.post('/refresh', async (req, res: Response) => {
+authRouter.post('/refresh', asyncHandler(async (req, res: Response) => {
   try {
     const data = refreshSchema.parse(req.body);
     const tokens = refreshTokens(data.refreshToken);
@@ -183,7 +184,7 @@ authRouter.post('/refresh', async (req, res: Response) => {
       error: { code: 'INVALID_REFRESH_TOKEN', message: '无效的刷新令牌' }
     });
   }
-});
+}));
 
 /**
  * GET /api/auth/me - 获取当前用户信息

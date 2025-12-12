@@ -45,9 +45,4 @@ const UserSchema = new Schema<IUser>({
   timestamps: true
 });
 
-// 索引
-UserSchema.index({ email: 1 });
-UserSchema.index({ phone: 1 });
-UserSchema.index({ wxOpenId: 1 });
-
 export const User = mongoose.model<IUser>('User', UserSchema);

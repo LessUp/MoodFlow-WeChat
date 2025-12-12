@@ -58,6 +58,12 @@
 - 新增 GitHub Actions 工作流：`.github/workflows/ci.yml`
   - `npm ci` -> `npm run build:deps` -> `npm run lint` -> `npm run test` -> `npm run build`
 
+## 修复：Mongoose Duplicate schema index 警告
+
+- 调整 `apps/api/src/models/User.ts`
+  - 移除重复的 `UserSchema.index({ email/phone/wxOpenId })` 声明。
+  - 保留字段上的 `unique: true` 索引定义，避免重复声明导致的启动告警。
+
 ## 兼容性说明
 
 - 本次改动以结构化与工程化为主，API 路由路径与主要返回结构保持兼容。

@@ -3,7 +3,7 @@
  */
 
 import { useState, useMemo } from 'react';
-import { Search as SearchIcon, Filter, X } from 'lucide-react';
+import { Search as SearchIcon, Filter } from 'lucide-react';
 import { useMoodStore } from '@/stores/mood';
 import { useSettingsStore } from '@/stores/settings';
 import { searchRecords } from '@moodflow/core';

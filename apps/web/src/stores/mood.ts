@@ -4,7 +4,7 @@
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { MoodRecordMap, MoodEntry } from '@moodflow/types';
+import type { MoodRecordMap } from '@moodflow/types';
 import { useAuthStore } from './auth';
 
 interface MoodState {

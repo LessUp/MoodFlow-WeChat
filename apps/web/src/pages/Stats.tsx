@@ -4,12 +4,11 @@
 
 import { useMemo, useState } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
-import { ChevronLeft, ChevronRight, TrendingUp, Calendar, Award, Smile } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useMoodStore } from '@/stores/mood';
 import { useSettingsStore } from '@/stores/settings';
 import { calculateDistribution, calculateStreak, calculateLongestStreak } from '@moodflow/core';
 import { MoodDistributionBar, YearHeatmap } from '@/components/StatsCard';
-import { cn } from '@/lib/utils';
 
 export function StatsPage() {
   const { records } = useMoodStore();

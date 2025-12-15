@@ -3,16 +3,21 @@ import { createStorageManager } from '../src/storage';
 import type { StorageAdapter, MoodRecordMap } from '@moodflow/types';
 
 const createMemoryAdapter = (initial: MoodRecordMap = {}): StorageAdapter => {
-  let store: Record<string, unknown> = initial ? { mood_records_v2: initial } : {};
+  const store: Record<string, unknown> = initial ? { mood_records_v2: initial } : {};
   return {
-    async get(key) {
-      return (store[key] as MoodRecordMap) || null;
+    async get<T>(key: string): Promise<T | null> {
+      return Object.prototype.hasOwnProperty.call(store, key) ? (store[key] as T) : null;
     },
-    async set(key, value) {
+    async set<T>(key: string, value: T): Promise<void> {
       store[key] = value;
     },
     async remove(key) {
       delete store[key];
+    },
+    async clear(): Promise<void> {
+      for (const key of Object.keys(store)) {
+        delete store[key];
+      }
     }
   };
 };

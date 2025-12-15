@@ -18,6 +18,7 @@
     "build": "npm run build:types && npm run build:core && npm run build:web && npm run build:api",
     "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
     "test": "npm test --workspaces --if-present",
+    "test:integration": "node tests/integration/run_tests.js",
     "postinstall": "npm run build:deps",
     "clean": "rm -rf node_modules packages/*/node_modules apps/*/node_modules packages/*/dist apps/*/dist"
   },

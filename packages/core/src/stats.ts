@@ -27,9 +27,9 @@ export function calculateDistribution(records: MoodRecordMap): Record<string, nu
 export function calculateStreak(records: MoodRecordMap): number {
   const today = new Date();
   let streak = 0;
-  let current = new Date(today);
+  const current = new Date(today);
   
-  while (true) {
+  for (;;) {
     const key = formatDateKey(current);
     const entry = records[key];
     

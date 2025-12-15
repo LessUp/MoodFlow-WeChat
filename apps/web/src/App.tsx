@@ -11,7 +11,7 @@ import { useAuthStore } from './stores/auth';
 import { useSettingsStore } from './stores/settings';
 
 function App() {
-  const { isAuthenticated, checkAuth } = useAuthStore();
+  const { checkAuth } = useAuthStore();
   const { settings, loadSettings } = useSettingsStore();
 
   useEffect(() => {

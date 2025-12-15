@@ -5,7 +5,7 @@
 import { useState } from 'react';
 import { 
   Sun, Moon, Monitor, Globe, Calendar as CalendarIcon,
-  Download, Upload, Cloud, RefreshCw, Trash2, LogOut
+  Download, Upload, RefreshCw, Trash2, LogOut
 } from 'lucide-react';
 import { useSettingsStore } from '@/stores/settings';
 import { useMoodStore } from '@/stores/mood';
